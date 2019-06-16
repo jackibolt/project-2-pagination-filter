@@ -1,50 +1,138 @@
 /******************************************
-Treehouse Techdegree:
+Treehouse Techdegree: Jacki Bolt
 FSJS project 2 - List Filter and Pagination
 ******************************************/
    
-// Study guide for this project - https://drive.google.com/file/d/1OD1diUsTMdpfMDv677TfL1xO2CEkykSz/view?usp=sharing
 
+// global variables
+const pageDiv = document.querySelector('.page');
+const fullStudentUL = document.querySelector('.student-list');
+const studentProfileList = document.querySelectorAll('.student-item');
+const displayPerPage = 10;
+let pageNo = 1;
 
-/*** 
-   Add your global variables that store the DOM elements you will 
-   need to reference and/or manipulate. 
-   
-   But be mindful of which variables should be global and which 
-   should be locally scoped to one of the two main functions you're 
-   going to create. A good general rule of thumb is if the variable 
-   will only be used inside of a function, then it can be locally 
-   scoped to that function.
-***/
+// limits display to only specified number of profiles
+const showPage = (list,page) => {
 
+   const firstIndex = (page-1) * displayPerPage;
+   const lastIndex = firstIndex + 9;
 
+   for (let i=0; i<list.length; i+=1) {
+      //shows profiles with index numbers within the specified range, hides remainders
+      if (i>=firstIndex && i<=lastIndex) {
+         list[i].style.display = 'block';
+      } else {
+         list[i].style.display = 'none';
+      }
+   }
+}
 
-
-/*** 
-   Create the `showPage` function to hide all of the items in the 
-   list except for the ten you want to show.
-
-   Pro Tips: 
-     - Keep in mind that with a list of 54 students, the last page 
-       will only display four.
-     - Remember that the first student has an index of 0.
-     - Remember that a function `parameter` goes in the parens when 
-       you initially define the function, and it acts as a variable 
-       or a placeholder to represent the actual function `argument` 
-       that will be passed into the parens later when you call or 
-       "invoke" the function 
-***/
+// shows first set of profiles on page load
+showPage(studentProfileList, pageNo);
 
 
 
+// function to load search bar
+const showSearchBar = () => {
+   const header = document.querySelector('.page-header');
+   const searchDiv = document.createElement('div');
+   searchDiv.className = 'student-search';
+   header.appendChild(searchDiv);
 
-/*** 
-   Create the `appendPageLinks function` to generate, append, and add 
-   functionality to the pagination buttons.
-***/
+   let input = document.createElement('input');
+   input.placeholder = 'Search for students...';
+   searchDiv.appendChild(input);
+   const button = document.createElement('button');
+   button.textContent = 'Search';
+   searchDiv.appendChild(button);
+}
+
+showSearchBar();
+
+// creates page links and adds functionality
+const appendPageLinks = (list) => {
+   const pagination = document.querySelector('.pagination');
+   if(pagination){
+      pagination.remove();
+   }
+
+   // calculates how many page links based on argument passed into the function / rounds up
+   const numOfButtons = Math.ceil(list.length / displayPerPage);
+
+   // creates div
+   let buttonsDiv = document.createElement('div');
+   buttonsDiv.className = 'pagination';
+   pageDiv.appendChild(buttonsDiv);
+
+   // creates ul 
+   let buttonsUL = document.createElement('ul');
+   buttonsDiv.appendChild(buttonsUL);
+
+   // creates li for each page, according to number of links needed
+   for (let i=0; i<numOfButtons; i+=1) {
+      let pageLI = document.createElement('li');
+      let pageLinks = document.createElement('a');
+      // index starts at zero, so +1 for text content
+      pageLinks.textContent = i + 1;
+      buttonsUL.appendChild(pageLI);
+      pageLI.appendChild(pageLinks);
+   }
+
+   //adds event listener to each individual page link + add/remove active class
+   const links = document.querySelectorAll('a');
+   for (let i=0; i<links.length; i+=1) {
+      links[i].addEventListener('click', () => {
+         //runs showPage function with the link[i] equal to the button's text content, and the page number passed to the function
+         showPage(studentProfileList, i+1);
+         for (let i=0; i<links.length; i+=1){
+            links[i].classList.remove('active');
+         }
+         event.target.className = 'active';
+      })
+   }
+}
+
+// runs the function, which includes the showPage function
+appendPageLinks(studentProfileList);
 
 
 
+// function to run search 
+// let query = document.querySelector('input');
+const searchButton = document.querySelector('button');
+const runSearch = (list) => {
 
+   let query = document.querySelector('input').value.toLowerCase();
 
-// Remember to delete the comments that came with this file, and replace them with your own code comments.
+   const studentNames = document.querySelectorAll('.student-details h3');
+   // array to store search results
+   const searchResults = [];
+
+   for (let i=0; i<list.length; i+=1) {
+      list[i].style.display = 'none';
+
+      const indName = (studentNames[i].textContent);
+      // test if search matches results
+      if (indName.includes(query)) {
+         searchResults.push(list[i]);
+      } 
+   }
+   showPage(searchResults, pageNo);
+   appendPageLinks(searchResults);
+
+   if (searchResults.length === 0) {
+      const noResultsDiv = document.createElement('div');
+      pageDiv.appendChild(noResultsDiv);
+      const noResultsMessage = document.createElement('p');
+      noResultsMessage.textContent = 'Sorry, no students with that name';
+      noResultsDiv.appendChild(noResultsMessage);
+   }
+}
+
+const input = document.querySelector('input');
+input.addEventListener('keyup', () => {
+   runSearch(studentProfileList);
+});
+searchButton.addEventListener('click', () => {
+   runSearch(studentProfileList);
+})
