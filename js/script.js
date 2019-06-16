@@ -11,7 +11,7 @@ const studentProfileList = document.querySelectorAll('.student-item');
 const displayPerPage = 10;
 let pageNo = 1;
 
-// limits display to only specified number of profiles
+// FUNCTION limits display to only specified number of profiles // 
 const showPage = (list,page) => {
 
    const firstIndex = (page-1) * displayPerPage;
@@ -32,7 +32,7 @@ showPage(studentProfileList, pageNo);
 
 
 
-// function to load search bar
+// FUNCTION to load search bar //
 const showSearchBar = () => {
    const header = document.querySelector('.page-header');
    const searchDiv = document.createElement('div');
@@ -46,10 +46,11 @@ const showSearchBar = () => {
    button.textContent = 'Search';
    searchDiv.appendChild(button);
 }
-
+// shows search bar
 showSearchBar();
 
-// creates page links and adds functionality
+
+// FUNCTION to create page links and adds functionality //
 const appendPageLinks = (list) => {
    const pagination = document.querySelector('.pagination');
    if(pagination){
@@ -97,8 +98,8 @@ appendPageLinks(studentProfileList);
 
 
 
-// function to run search 
-// let query = document.querySelector('input');
+// FUNCTION to run search //
+
 const searchButton = document.querySelector('button');
 const runSearch = (list) => {
 
@@ -109,6 +110,7 @@ const runSearch = (list) => {
    const searchResults = [];
 
    for (let i=0; i<list.length; i+=1) {
+      // hide all profiles
       list[i].style.display = 'none';
 
       const indName = (studentNames[i].textContent);
@@ -117,9 +119,11 @@ const runSearch = (list) => {
          searchResults.push(list[i]);
       } 
    }
+   // show search results, add page links
    showPage(searchResults, pageNo);
    appendPageLinks(searchResults);
 
+   // add no results text
    if (searchResults.length === 0) {
       const noResultsDiv = document.createElement('div');
       pageDiv.appendChild(noResultsDiv);
@@ -129,6 +133,7 @@ const runSearch = (list) => {
    }
 }
 
+// event listeners to run search function
 const input = document.querySelector('input');
 input.addEventListener('keyup', () => {
    runSearch(studentProfileList);
